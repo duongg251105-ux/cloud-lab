@@ -8,15 +8,18 @@ services:
     environment:
       PORT: 5000
       MONGO_URI: ${MONGO_URI}
+      CLIENT_URL: http://localhost:3000
     networks:
       - student-network
 
   frontend:
     build:
       context: ./client
+      args:
+        VITE_API_URL: http://localhost:5000
     container_name: student-frontend
     ports:
-      - "3000:3000"
+      - "3000:80"
     depends_on:
       - backend
     networks:

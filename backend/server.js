@@ -5,7 +5,26 @@ require('dotenv').config();
 const studentRoutes = require('./routes/students');
 
 const app = express();
-app.use(cors());
+
+// Cấu hình CORS cho Production (Câu 58)
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'http://localhost:5173',
+  'http://localhost:3000'
+].filter(Boolean);
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Cho phép: request không có origin (curl, Postman), domain trong danh sách, hoặc môi trường không phải production
+    if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+      callback(null, true);
+    } else {
+      callback(null, false); // Chặn domain lạ
+    }
+  },
+  credentials: true
+}));
+
 app.use(express.json());
 
 // Kết nối MongoDB Atlas (Câu 33)
@@ -22,5 +41,4 @@ app.use('/api/students', studentRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+  console.log(`Server running on port
